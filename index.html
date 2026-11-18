@@ -17,16 +17,25 @@
   h1{font-size:28px;margin:0 0 6px;letter-spacing:-.01em}
   .contact{margin:0;color:#555;font-size:15px}
   .contact a{color:#555}
-  nav{position:sticky;top:0;background:#fff;margin:24px -16px 8px;padding:10px 16px;border-bottom:1px solid #eee;display:flex;flex-wrap:wrap;gap:8px;z-index:1}
+  nav{position:sticky;top:0;background:#fff;margin:24px -16px 8px;padding:10px 16px;border-bottom:1px solid #eee;display:flex;flex-wrap:wrap;gap:8px;z-index:2}
   nav a{flex:none;padding:6px 12px;border:1px solid #ddd;border-radius:999px;color:#111;text-decoration:none;font-size:14px;white-space:nowrap}
   nav a:hover{background:#f4f4f4}
   section{padding-top:24px;scroll-margin-top:110px}
   h2{font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:#777;margin:0 0 8px;font-weight:600}
   ul{list-style:none;margin:0;padding:0}
-  li a{display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:12px 0;border-bottom:1px solid #eee;color:#111;text-decoration:none}
-  li a:hover .t{text-decoration:underline}
+  li{display:flex;justify-content:space-between;align-items:baseline;gap:16px;padding:12px 0;border-bottom:1px solid #eee}
+  li a{color:#111;text-decoration:none}
+  li a:hover{text-decoration:underline}
   .m{flex:none;color:#888;font-size:13px}
-  @media (max-width:480px){li a{flex-direction:column;gap:2px}}
+  .tag{display:inline-block;margin-left:6px;padding:0 8px;border:1px solid #ddd;border-radius:999px;font-size:12px;color:#555;line-height:20px;vertical-align:1px;white-space:nowrap}
+  .tip{position:relative;display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;margin-left:6px;border-radius:50%;background:#111;color:#fff;font-size:12px;font-weight:700;cursor:pointer;vertical-align:1px;outline:none}
+  .tip .b{display:none;position:absolute;left:50%;top:26px;transform:translateX(-50%);width:min(240px,80vw);padding:8px 10px;background:#111;color:#fff;font-size:13px;font-weight:400;line-height:1.4;border-radius:6px;z-index:3}
+  .tip:hover .b,.tip:focus .b{display:block}
+  video{display:block;width:200px;max-width:60%;margin-top:10px;border-radius:12px;background:#000}
+  details{border-bottom:1px solid #eee}
+  summary{cursor:pointer;padding:12px 0;font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:#777;font-weight:600}
+  details li:last-child{border-bottom:0}
+  @media (max-width:480px){li{flex-direction:column;gap:2px}}
 </style>
 </head>
 <body>
@@ -43,37 +52,62 @@
     <a href="#finance">Finance</a>
     <a href="#research">Research Reports</a>
     <a href="#projects">Personal Projects</a>
+    <a href="#books">Books</a>
   </nav>
 
   <section id="pm">
     <h2>Product Management</h2>
     <ul>
-      <li><a href="files/Building_Kiron_PM_Record.pdf" target="_blank" rel="noopener"><span class="t">Building Kiron: product management record</span><span class="m">PDF · 7 pp · Nov 2026</span></a></li>
+      <li><span><a href="files/Building_Kiron_PM_Record.pdf" target="_blank" rel="noopener">Building Kiron: product management record</a></span><span class="m">PDF · 7 pp · Nov 2026</span></li>
     </ul>
   </section>
 
   <section id="finance">
     <h2>Finance</h2>
     <ul>
-      <li><a href="files/India_Wellness_Investor_Report_Nov2026.pdf" target="_blank" rel="noopener"><span class="t">India Non-Pharma Health &amp; Wellness: Investor Report</span><span class="m">PDF · 24 pp · Nov 2026</span></a></li>
-      <li><a href="files/India_Wellness_Actionable_Insights.pdf" target="_blank" rel="noopener"><span class="t">India Wellness: Actionable Insights</span><span class="m">PDF · 14 pp · Nov 2026</span></a></li>
+      <li><span><a href="files/Best_Funds_Analysis.pdf" target="_blank" rel="noopener">Best Funds Analysis</a><span class="tip" tabindex="0" role="button" aria-label="About this work">!<span class="b">This analysis and its presentation got me hired as a portfolio manager in my current role.</span></span></span><span class="m">PDF · 5 pp · Feb 2026</span></li>
+      <li><span><a href="tools/Portfolio_tool.html" target="_blank" rel="noopener">Portfolio analysis tool</a></span><span class="m">Interactive · anonymised</span></li>
+      <li><span><a href="files/India_Wellness_Investor_Report_Nov2026.pdf" target="_blank" rel="noopener">India Non-Pharma Health &amp; Wellness: Investor Report</a></span><span class="m">PDF · 24 pp · Nov 2026</span></li>
+      <li><span><a href="files/India_Wellness_Actionable_Insights.pdf" target="_blank" rel="noopener">India Wellness: Actionable Insights</a></span><span class="m">PDF · 14 pp · Nov 2026</span></li>
+      <li><span><a href="files/Behavioral_Finance_Article.pdf" target="_blank" rel="noopener">The best strategy to (reliably) make money in the market</a><span class="tag">Behavioral finance</span></span><span class="m">PDF · 4 pp · Mar 2026</span></li>
     </ul>
   </section>
 
   <section id="research">
     <h2>Research Reports</h2>
     <ul>
-      <li><a href="files/Whey_Protein_Global_Squeeze_and_Coming_Glut.pdf" target="_blank" rel="noopener"><span class="t">Whey Protein: The Global Squeeze and the Coming Glut</span><span class="m">PDF · 15 pp · Nov 2026</span></a></li>
-      <li><a href="files/India_Whey_Glut_Who_Wins.pdf" target="_blank" rel="noopener"><span class="t">India's Whey Glut: Who Wins</span><span class="m">PDF · 11 pp · Nov 2026</span></a></li>
-      <li><a href="files/Health_Wellness_Industry_Report_Draft.pdf" target="_blank" rel="noopener"><span class="t">Health &amp; Wellness Industry Report (draft)</span><span class="m">PDF · 3 pp · Nov 2026</span></a></li>
+      <li><span><a href="files/Whey_Protein_Global_Squeeze_and_Coming_Glut.pdf" target="_blank" rel="noopener">Whey Protein: The Global Squeeze and the Coming Glut</a></span><span class="m">PDF · 15 pp · Nov 2026</span></li>
+      <li><span><a href="files/India_Whey_Glut_Who_Wins.pdf" target="_blank" rel="noopener">India's Whey Glut: Who Wins</a></span><span class="m">PDF · 11 pp · Nov 2026</span></li>
+      <li><span><a href="files/Health_Wellness_Industry_Report_Draft.pdf" target="_blank" rel="noopener">Health &amp; Wellness Industry Report (draft)</a></span><span class="m">PDF · 3 pp · Nov 2026</span></li>
     </ul>
   </section>
 
   <section id="projects">
     <h2>Personal Projects</h2>
     <ul>
-      <li><a href="https://github.com/pranjalparashar1/kiron" target="_blank" rel="noopener"><span class="t">Kiron: quiz app for remembering what you read</span><span class="m">GitHub</span></a></li>
+      <li><span><a href="https://pranjalparashar1.github.io/kiron/" target="_blank" rel="noopener">Kiron: quiz app for remembering what you read</a></span><span class="m">Web app</span></li>
+      <li style="display:block"><span>Cals: AI calorie and protein tracker<span class="tag">Collaborative</span></span>
+        <video controls playsinline muted preload="none" poster="media/cals_demo_poster.jpg"><source src="media/cals_demo.mp4" type="video/mp4"></video></li>
     </ul>
+  </section>
+
+  <section id="books">
+    <details>
+      <summary>Books read this year (11)</summary>
+      <ul>
+        <li><span><a href="https://www.goodreads.com/book/show/38315.Fooled_by_Randomness" target="_blank" rel="noopener">Fooled by Randomness</a><span class="tag">Risk</span></span><span class="m">Nassim Taleb · Incerto</span></li>
+        <li><span><a href="https://www.goodreads.com/book/show/242472.The_Black_Swan" target="_blank" rel="noopener">The Black Swan</a><span class="tag">Risk</span></span><span class="m">Nassim Taleb · Incerto</span></li>
+        <li><span><a href="https://www.goodreads.com/book/show/13530973-antifragile" target="_blank" rel="noopener">Antifragile</a><span class="tag">Risk</span></span><span class="m">Nassim Taleb · Incerto</span></li>
+        <li><span><a href="https://www.goodreads.com/book/show/36064445-skin-in-the-game" target="_blank" rel="noopener">Skin in the Game</a><span class="tag">Risk</span></span><span class="m">Nassim Taleb · Incerto</span></li>
+        <li><span><a href="https://www.goodreads.com/book/show/52215290-alchemy" target="_blank" rel="noopener">Alchemy</a><span class="tag">Behavioral economics</span></span><span class="m">Rory Sutherland</span></li>
+        <li><span><a href="https://www.goodreads.com/book/show/23346490-zero-to-one" target="_blank" rel="noopener">Zero to One</a><span class="tag">Startups</span></span><span class="m">Peter Thiel</span></li>
+        <li><span><a href="https://www.goodreads.com/book/show/11084145-steve-jobs" target="_blank" rel="noopener">Steve Jobs</a><span class="tag">Biography</span></span><span class="m">Walter Isaacson</span></li>
+        <li><span><a href="https://www.goodreads.com/en/book/show/223856801-a-fabulous-debt" target="_blank" rel="noopener">A Fabulous Debt</a><span class="tag">Financial history</span></span><span class="m">Robin Wigglesworth</span></li>
+        <li><span><a href="https://www.goodreads.com/book/show/211399783-the-thinking-machine" target="_blank" rel="noopener">The Thinking Machine</a><span class="tag">Technology</span></span><span class="m">Stephen Witt</span></li>
+        <li><span><a href="https://www.goodreads.com/book/show/17027594" target="_blank" rel="noopener">What I Learned Losing a Million Dollars</a><span class="tag">Trading psychology</span></span><span class="m">Jim Paul</span></li>
+        <li><span><a href="https://www.goodreads.com/book/show/49644992-the-price-of-peace" target="_blank" rel="noopener">The Price of Peace</a><span class="tag">Economics</span><span class="tag">Reading</span></span><span class="m">Zachary D. Carter</span></li>
+      </ul>
+    </details>
   </section>
 </main>
 </body>

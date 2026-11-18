@@ -1,0 +1,326 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Portfolio tool</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;700;800&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one reading column; headline result on top, a control strip, then three exhibits (returns, contribution by stock, concentration). */
+:root{
+  --bg:#f6f7f9; --surface:#ffffff; --ink:#14181f; --ink2:#4a5360; --muted:#788190; --line:#dfe3e9;
+  --gain:#1f6fd1; --loss:#d4561a; --ghost:#c7ccd5; --bench:#6b7686; --hatch:#b7bdc8;
+  --display:'Schibsted Grotesk',system-ui,-apple-system,'Segoe UI',sans-serif; --mono:'JetBrains Mono',ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0f131a; --surface:#171c25; --ink:#eef1f5; --ink2:#b4bcc8; --muted:#8a93a2; --line:#2a313d;
+  --gain:#5aa2f5; --loss:#f08850; --ghost:#3a4351; --bench:#98a3b3; --hatch:#4a5465; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f131a; --surface:#171c25; --ink:#eef1f5; --ink2:#b4bcc8; --muted:#8a93a2; --line:#2a313d;
+  --gain:#5aa2f5; --loss:#f08850; --ghost:#3a4351; --bench:#98a3b3; --hatch:#4a5465; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--display);font-size:15px;line-height:1.5;
+  padding-block:32px 56px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:880px;margin:0 auto;display:flex;flex-direction:column;gap:28px}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.eyebrow{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:500}
+h1{font-size:clamp(30px,6vw,52px);line-height:1.04;margin:6px 0 12px;font-weight:800;letter-spacing:-.02em;text-wrap:balance}
+h2{font-size:18px;margin:0 0 4px;font-weight:700;text-wrap:balance}
+p{margin:0}.lead{color:var(--ink2);max-width:62ch}
+.hero{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.big{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:18px}
+.big .v{font-family:var(--mono);font-size:clamp(34px,7vw,56px);font-weight:500;line-height:1.05;letter-spacing:-.03em;margin:6px 0 4px;font-variant-numeric:tabular-nums}
+.big .s{color:var(--ink2);font-size:13px}
+.big.now{border-color:var(--ink)}
+.pos{color:var(--gain)}.neg{color:var(--loss)}
+.controls{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:6px;overflow:hidden;background:var(--surface)}
+.seg button{font:inherit;font-size:14px;padding:8px 14px;border:0;background:transparent;color:var(--ink2);cursor:pointer;border-right:1px solid var(--line)}
+.seg button:last-child{border-right:0}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg);font-weight:700}
+button:focus-visible,input:focus-visible,summary:focus-visible,.row:focus-visible{outline:2px solid var(--gain);outline-offset:2px}
+.hint{font-size:13px;color:var(--muted)}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:20px;display:flex;flex-direction:column;gap:16px}
+.sub{color:var(--ink2);font-size:14px;max-width:64ch}
+/* returns bars */
+.rb{display:grid;grid-template-columns:150px 1fr;gap:6px 12px;align-items:center}
+.rb .lab{font-size:14px}.rb .lab small{display:block;color:var(--muted);font-size:12px}
+.axis{position:relative;height:34px}
+.axis .z{position:absolute;top:-4px;bottom:-4px;width:1px;background:var(--muted)}
+.axis .ghost,.axis .cur{position:absolute;height:12px;border-radius:0 3px 3px 0}
+.axis .ghost{top:0;background:var(--ghost)}
+.axis .cur{top:15px;height:16px}
+.axis .val{position:absolute;top:13px;font-size:13px;font-weight:500;white-space:nowrap}
+.lg{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:13px;color:var(--ink2)}
+.lg i{display:inline-block;width:14px;height:8px;margin-right:6px;border-radius:2px;vertical-align:baseline}
+/* contribution rows */
+.rows{display:flex;flex-direction:column;gap:2px}
+.row{display:grid;grid-template-columns:220px 1fr 96px;align-items:center;gap:8px;padding:2px 4px;border-radius:4px;cursor:pointer;min-height:24px;background:none;border:0;font:inherit;color:inherit;text-align:left;width:100%}
+.row:hover{background:var(--bg)}
+.row .nm{font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row .tr{position:relative;height:14px}
+.row .tr .zl{position:absolute;top:-6px;bottom:-6px;width:1px;background:var(--line)}
+.row .bar{position:absolute;top:1px;height:12px;min-width:2px}
+.row .gv{font-size:12px;text-align:right;color:var(--ink2)}
+.row.off .nm{text-decoration:line-through;color:var(--muted)}
+.row.off .bar{background:repeating-linear-gradient(135deg,var(--hatch) 0 3px,transparent 3px 6px)!important;border:1px solid var(--hatch)}
+.row.off .gv{color:var(--muted)}
+/* concentration */
+.strip{display:flex;height:44px;gap:1px;align-items:stretch}
+.strip .seg2{min-width:1px;cursor:pointer;background:var(--ghost);border-radius:1px}
+.strip .seg2.tp{background:var(--gain)}
+.strip .seg2.tp2{background:var(--bench)}
+.strip .seg2.off{background:repeating-linear-gradient(135deg,var(--hatch) 0 3px,transparent 3px 6px);outline:1px solid var(--hatch);outline-offset:-1px}
+.stripl{display:flex;justify-content:space-between;font-size:13px;color:var(--ink2);gap:12px;flex-wrap:wrap}
+/* stress */
+.stress{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:center}
+input[type=range]{width:100%;accent-color:var(--loss)}
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}
+.fact{border-top:2px solid var(--ink);padding-top:8px}
+.fact b{font-family:var(--mono);font-weight:500;font-size:22px;display:block}
+.fact span{font-size:13px;color:var(--ink2)}
+details{font-size:13px;color:var(--ink2)} summary{cursor:pointer;font-weight:700;color:var(--ink)}
+.tw{overflow-x:auto;margin-top:10px}
+table{border-collapse:collapse;width:100%;font-size:12.5px;min-width:560px}
+th,td{padding:5px 8px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+th:first-child,td:first-child{text-align:left} th{color:var(--muted);font-weight:500}
+.notes{font-size:12.5px;color:var(--muted);max-width:80ch;display:flex;flex-direction:column;gap:6px}
+#tip{position:fixed;z-index:9;pointer-events:none;background:var(--ink);color:var(--bg);padding:7px 10px;border-radius:5px;font-size:12.5px;line-height:1.4;max-width:260px;opacity:0;transition:opacity .08s}
+@media (max-width:620px){
+  .hero{grid-template-columns:1fr}.rb{grid-template-columns:1fr}.stress{grid-template-columns:1fr}
+  .row{grid-template-columns:120px 1fr 70px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+.nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding:10px 0;margin:-10px 0 0;display:flex;gap:8px;flex-wrap:wrap;border-bottom:1px solid var(--line)}
+.nav a{font-size:14px;font-weight:500;color:var(--ink2);text-decoration:none;padding:6px 12px;border:1px solid var(--line);border-radius:6px;background:var(--surface)}
+.nav a:hover{color:var(--ink);border-color:var(--ink)}
+.ov{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.ovc{display:block;text-decoration:none;color:inherit;background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:14px 16px}
+.ovc:hover{border-color:var(--ink)}
+.ovc .v{font-family:var(--mono);font-size:26px;letter-spacing:-.03em;font-variant-numeric:tabular-nums;margin:4px 0}
+.ovc .v small{font-size:14px;color:var(--muted);letter-spacing:0}
+.ovc .s{font-size:13px;color:var(--ink2)}
+.sec{display:flex;flex-direction:column;gap:20px;scroll-margin-top:60px}
+.sec+.sec{border-top:1px solid var(--line);padding-top:36px}
+.headline{font-size:clamp(26px,5vw,42px);line-height:1.08;margin:6px 0 10px;font-weight:800;letter-spacing:-.02em;text-wrap:balance}
+h3{font-size:18px;margin:0 0 4px;font-weight:700}
+.kind{display:inline-block;font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);border:1px solid var(--line);border-radius:3px;padding:0 4px;margin-left:6px;vertical-align:1px}
+@media (max-width:620px){.ov{grid-template-columns:1fr}}
+
+.rank{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.rank .seg button{padding:6px 12px;font-size:13px}
+.row .gv small{display:block;color:var(--muted);font-size:11px}
+.row{min-height:30px}
+.row .tr .bm{position:absolute;top:-1px;width:2px;height:16px;background:var(--ink);opacity:.75}
+.lg i.tk{width:2px;height:12px;border-radius:0;margin-right:7px;vertical-align:-2px;background:var(--ink)}
+.hero3{grid-template-columns:repeat(3,1fr)}
+.hero3 .big{min-width:0}
+.hero3 .big .v{font-size:clamp(28px,4.4vw,40px);white-space:nowrap}
+.ctl{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.meta{font-size:12px;color:var(--muted);margin-top:2px}
+.bw{position:relative;height:14px}
+.bw .b{position:absolute;top:0;height:14px;border-radius:0 3px 3px 0}
+.bw .zl{position:absolute;top:-4px;bottom:-4px;width:1px;background:var(--muted)}
+.fhead{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr) minmax(0,1fr);gap:20px;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:500;padding-bottom:6px}
+.fr{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr) minmax(0,1fr);gap:8px 20px;align-items:center;padding:12px 0;border-top:1px solid var(--line)}
+.fr:first-child{border-top:0}
+.fr .nm2,.nm2{font-size:14px;font-weight:700;line-height:1.3}
+.tagp{display:inline-block;font-size:10px;letter-spacing:.06em;text-transform:uppercase;border:1px solid var(--line);border-radius:3px;padding:0 5px;margin-right:6px;color:var(--ink2);vertical-align:1px}
+.tagp.reg{border-color:var(--loss);color:var(--loss)}
+.cv{font-family:var(--mono);font-size:14px;font-variant-numeric:tabular-nums;margin-top:4px}
+.cs{font-size:12px;color:var(--ink2)}
+.callout{border-left:3px solid var(--loss);padding:4px 0 4px 14px;max-width:70ch}
+input.ter{width:68px;font:inherit;font-family:var(--mono);font-size:12.5px;padding:3px 6px;border:1px solid var(--line);border-radius:4px;background:var(--bg);color:var(--ink);text-align:right}
+.src{font-size:11px;color:var(--muted);white-space:normal;min-width:160px;text-align:left}
+@media (max-width:700px){.hero3{grid-template-columns:1fr}.fr,.fhead{grid-template-columns:1fr}.fhead{display:none}}
+</style>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Anonymised client · mutual funds · valued 14 Oct 2026</div>
+    <h1>Where the fund XIRR comes from, and what the funds cost</h1>
+    <p class="lead">Two views of the same funds. The first shows how much of the equity XIRR rests on the top few funds; XIRR is recalculated from the transaction history each time a fund is left out. The second sets each fund's yearly fee against its gain over its benchmark,.</p>
+  </header>
+  <nav class="nav" aria-label="Sections"><a href="#equity">Top funds</a><a href="#fees">Fees</a></nav>
+  <div id="sections" style="display:flex;flex-direction:column;gap:36px"></div>
+  <section class="notes" style="margin-top:-12px">
+    <p><b>How to read this.</b> Portfolio XIRR uses the dated purchases, redemptions and switches of the funds in view, plus today's value. Benchmark XIRR uses the same dated cash flows with the value the benchmark would have reached. Each fund and the group are worked out on the units held today, so they will not match the portfolio app, which includes units already sold. Rupee gain is current value minus the cost still held.</p>
+    <p>A fund's XIRR counts only money since it was first held in its current form. The older funds were held for years, and part of their gains was taken out through redemptions, so a small balance today can still carry a high XIRR. The funds bought in 2024 and 2025 have a short history, which makes their XIRR noisy. Where the benchmark would have been worth less than zero after the same redemptions (Aditya BSL Digital India, Tata Digital India, DSP ELSS), the file's own benchmark XIRR is shown for that fund. Past returns do not predict future returns.</p>
+  </section>
+  <section class="sec" id="fees" style="border-top:1px solid var(--line);padding-top:36px"></section>
+</div>
+<div id="tip" role="tooltip"></div>
+
+<script>
+const FUNDS=[{"n": "Kotak Gold (Direct)", "full": "Kotak Gold Dir Gr", "type": "Commodities", "cat": "Sector - Precious Metals", "cost": 149992.5, "val": 457528.55009399995, "bv": 282833.70220636314, "x": 0.22112271971782513, "bx": 0.12032067356557258, "since": "2021-03-09", "flows": [[18695, -49997.5], [18704, -49997.5], [18708, -49997.5]]}, {"n": "Parag Parikh Conservative Hybrid (Direct)", "full": "Parag Parikh Cnsv Hyb Dir Gr", "type": "Fixed Income", "cat": "Conservative Allocation", "cost": 822147.0700000001, "val": 1040989.4560890001, "bv": null, "x": 0.0789077411340073, "bx": null, "since": "2021-06-11", "flows": [[18789, -85409.81], [18899, -49997.5], [19725, -186764.76], [19726, -199990.0], [19759, -199990.0], [20004, -99995.0]]}, {"n": "HDFC Large Cap", "full": "HDFC Large Cap Gr", "type": "Equity", "cat": "Large-Cap", "cost": 199990.0, "val": 197057.572281, "bv": 201703.53771069783, "x": -0.008441485654465897, "bx": 0.004908297184007315, "since": "2025-01-16", "flows": [[20104, -199990.0]]}, {"n": "Axis Large Cap (Direct)", "full": "Axis Large Cap Fund Dir Gr", "type": "Equity", "cat": "Large-Cap", "cost": 5956.48, "val": 13870.47299, "bv": null, "x": 0.1410011967208098, "bx": null, "since": "2020-05-19", "flows": [[18401, -5956.48]]}, {"n": "HDFC Multi-Asset Active FoF (Direct)", "full": "HDFC Multi-Asset Active FoF Dir Gr", "type": "Fixed Income", "cat": "Fund of Funds", "cost": 599970.0, "val": 680788.442859, "bv": 602455.5577052623, "x": 0.0622747303329429, "bx": 0.001978377131167418, "since": "2024-09-05", "flows": [[19971, -499975.0], [20004, -99995.0]]}, {"n": "ICICI Pru India Opportunities (Regular)", "full": "ICICI Pru India Opports Reg Gr", "type": "Equity", "cat": "Equity - Other", "cost": 499975.0, "val": 512597.20764, "bv": 501953.649284433, "x": 0.013977744145323179, "bx": 0.0022019441118537025, "since": "2024-07-09", "flows": [[19913, -9999.5], [19920, -9999.5], [19927, -9999.5], [19934, -9999.5], [19941, -9999.5], [19948, -9999.5], [19955, -9999.5], [19962, -9999.5], [19969, -9999.5], [19976, -9999.5], [19983, -9999.5], [19990, -9999.5], [19997, -9999.5], [20004, -9999.5], [20011, -9999.5], [20018, -9999.5], [20025, -9999.5], [20032, -9999.5], [20039, -9999.5], [20046, -9999.5], [20053, -9999.5], [20060, -9999.5], [20067, -9999.5], [20074, -9999.5], [20081, -9999.5], [20088, -9999.5], [20095, -9999.5], [20102, -9999.5], [20109, -9999.5], [20116, -9999.5], [20123, -9999.5], [20130, -9999.5], [20137, -9999.5], [20144, -9999.5], [20151, -9999.5], [20158, -9999.5], [20165, -9999.5], [20172, -9999.5], [20181, -9999.5], [20186, -9999.5], [20194, -9999.5], [20200, -9999.5], [20207, -9999.5], [20214, -9999.5], [20222, -9999.5], [20229, -9999.5], [20235, -9999.5], [20242, -9999.5], [20249, -9999.5], [20256, -9999.5]]}, {"n": "Nippon India Gold Savings (Direct)", "full": "Nippon India Gold Savings Dir Gr", "type": "Commodities", "cat": "Sector - Precious Metals", "cost": 415157.97, "val": 1209413.9153250002, "bv": null, "x": 0.18950519266834906, "bx": null, "since": "2019-12-05", "flows": [[18235, -65170.47], [18430, -100000.0], [18509, -99995.0], [18600, -49997.5], [18639, -49997.5], [18695, -49997.5]]}, {"n": "Aditya BSL Digital India (Direct)", "full": "Aditya BSL Digital India Dir Gr", "type": "Equity", "cat": "Sector - Technology", "cost": 39242.37, "val": 136192.71168, "bv": null, "x": 0.2135049376795628, "bx": null, "since": "2020-05-11", "flows": [[18393, -39242.37]]}, {"n": "Tata Digital India (Direct)", "full": "Tata Digital India Dir Gr", "type": "Equity", "cat": "Sector - Technology", "cost": 17325.21, "val": 58254.9995027, "bv": null, "x": 0.20774145531195676, "bx": null, "since": "2020-05-13", "flows": [[18395, -17325.21]]}, {"n": "DSP ELSS Tax Saver (Regular)", "full": "DSP ELSS Tax Saver Reg IDCW-P", "type": "Equity", "cat": "ELSS (Tax Savings)", "cost": 0, "val": 8.262507, "bv": null, "x": 0.151534, "bx": null, "since": "2007-01-18", "flows": [[15754, -0.0], [16118, -0.0], [16479, 1.88], [16570, 0.18], [16668, 0.2], [16759, 0.18], [16843, 0.18], [16941, 0.18], [17032, 0.16], [17123, 0.16], [17207, 0.16], [17298, 0.16], [17389, 0.18], [17480, 0.18], [17571, 0.18], [17662, 0.18], [17753, 0.18], [17844, 0.18], [17935, 0.18], [18026, 0.16], [18117, 0.16], [18208, 0.16], [18761, 0.16], [18852, 0.2], [18946, 0.16], [19040, 0.16], [19131, 0.18], [19222, 0.2], [19313, 0.2], [19404, 0.19], [19495, 0.19], [19586, 0.2], [19684, 0.21], [19768, 0.23], [19859, 0.24], [19958, 0.27], [20041, 0.26], [20132, 0.24], [20223, 0.24], [20314, 0.24], [20405, 0.24], [20496, 0.24], [20587, 0.23], [20678, 0.23]]}, {"n": "HDFC Technology (Regular)", "full": "HDFC Technology Reg Gr", "type": "Equity", "cat": "Sector - Technology", "cost": 299985.0, "val": 280441.459482, "bv": 309009.9440072775, "x": -0.030322958845521185, "bx": 0.013630147432652635, "since": "2024-04-23", "flows": [[19836, -99995.0], [19857, -4999.75], [19865, -4999.75], [19871, -4999.75], [19878, -4999.75], [19885, -4999.75], [19893, -4999.75], [19899, -4999.75], [19906, -4999.75], [19913, -4999.75], [19920, -4999.75], [19927, -4999.75], [19934, -4999.75], [19941, -4999.75], [19948, -4999.75], [19955, -4999.75], [19962, -4999.75], [19969, -4999.75], [19976, -4999.75], [19983, -4999.75], [19990, -4999.75], [19997, -4999.75], [20004, -4999.75], [20011, -4999.75], [20018, -4999.75], [20025, -4999.75], [20032, -4999.75], [20039, -4999.75], [20046, -4999.75], [20053, -4999.75], [20060, -4999.75], [20067, -4999.75], [20074, -4999.75], [20081, -4999.75], [20088, -4999.75], [20095, -4999.75], [20102, -4999.75], [20109, -4999.75], [20116, -4999.75], [20123, -4999.75], [20130, -4999.75]]}, {"n": "HDFC Manufacturing (Regular)", "full": "HDFC Manufacturing Reg Gr", "type": "Equity", "cat": "Equity - Other", "cost": 499975.0, "val": 551423.963156, "bv": 501953.649284433, "x": 0.05599531704289861, "bx": 0.0022019441118537025, "since": "2024-07-09", "flows": [[19913, -9999.5], [19920, -9999.5], [19927, -9999.5], [19934, -9999.5], [19941, -9999.5], [19948, -9999.5], [19955, -9999.5], [19962, -9999.5], [19969, -9999.5], [19976, -9999.5], [19983, -9999.5], [19990, -9999.5], [19997, -9999.5], [20004, -9999.5], [20011, -9999.5], [20018, -9999.5], [20025, -9999.5], [20032, -9999.5], [20039, -9999.5], [20046, -9999.5], [20053, -9999.5], [20060, -9999.5], [20067, -9999.5], [20074, -9999.5], [20081, -9999.5], [20088, -9999.5], [20095, -9999.5], [20102, -9999.5], [20109, -9999.5], [20116, -9999.5], [20123, -9999.5], [20130, -9999.5], [20137, -9999.5], [20144, -9999.5], [20151, -9999.5], [20158, -9999.5], [20165, -9999.5], [20172, -9999.5], [20181, -9999.5], [20186, -9999.5], [20194, -9999.5], [20200, -9999.5], [20207, -9999.5], [20214, -9999.5], [20222, -9999.5], [20229, -9999.5], [20235, -9999.5], [20242, -9999.5], [20249, -9999.5], [20256, -9999.5]]}, {"n": "Mirae Nifty SC250 Mom Quality 100 FoF (Regular)", "full": "Mirae Ast Nfty SC 250MQ100ETFFoFRgGr", "type": "Equity", "cat": "Equity - Other", "cost": 306339.87, "val": 298787.87228799996, "bv": 334861.13439001475, "x": -0.011487939180621277, "bx": 0.042024266494688156, "since": "2024-04-23", "flows": [[19836, -99995.0], [19867, -4999.75], [19873, -4999.75], [19880, -4999.75], [19887, -4999.75], [19894, -4999.75], [19901, -4999.75], [19908, -4999.75], [19915, -4999.75], [19923, -4999.75], [19929, -4999.75], [19936, -4999.75], [19943, -4999.75], [19951, -4999.75], [19957, -4999.75], [19964, -4999.75], [19971, -4999.75], [19978, -4999.75], [19986, -4999.75], [19992, -4999.75], [20000, -4999.75], [20006, -4999.75], [20013, -4999.75], [20020, -4999.75], [20027, -4999.75], [20034, -4999.75], [20041, -4999.75], [20049, -4999.75], [20055, -4999.75], [20062, -4999.75], [20069, -4999.75], [20076, -4999.75], [20084, -4999.75], [20090, -4999.75], [20097, -4999.75], [20104, -4999.75], [20111, -4999.75], [20118, -4999.75], [20125, -4999.75], [20132, -4999.75], [20140, -4999.75], [20147, -4999.75], [20153, -1355.12]]}];
+const $$=(s,r=document)=>r.querySelector(s);
+const inr=v=>{const a=Math.abs(v);return (v<0?'−':'')+'₹'+(a>=1e5?(a/1e5).toFixed(2)+' L':Math.round(a).toLocaleString('en-IN'))};
+const pc=(v,s)=>v==null?'n/a':(v<0?'−':(s?'+':''))+Math.abs(v*100).toFixed(1)+'%';
+const cls=v=>v==null?'':v<0?'neg':'pos';
+const W=['no','one','two','three','four','five'];
+const END=Date.UTC(2026,9,14)/864e5;
+const tip=$$('#tip');
+function showTip(e,h){tip.innerHTML=h;tip.style.opacity=1;const w=tip.offsetWidth;let x=e.clientX+14;if(x+w>innerWidth-8)x=e.clientX-w-14;tip.style.left=Math.max(8,x)+'px';tip.style.top=Math.min(e.clientY+14,innerHeight-tip.offsetHeight-8)+'px'}
+const hideTip=()=>tip.style.opacity=0;
+function xirr(flows,tv){const cf=flows.concat([[END,tv]]);if(!cf.length)return null;const t0=Math.min(...cf.map(c=>c[0]));
+  const f=r=>{let s=0;for(const [d,a] of cf)s+=a/Math.pow(1+r,(d-t0)/365);return s};
+  let lo=-0.95,hi=100,flo=f(lo),fhi=f(hi);if(flo*fhi>0)return null;
+  for(let i=0;i<200;i++){const m=(lo+hi)/2,fm=f(m);if(flo*fm<=0){hi=m;fhi=fm}else{lo=m;flo=fm}}return (lo+hi)/2}
+const monthsSince=s=>Math.max(1,Math.round((new Date('2026-10-14')-new Date(s))/2629800000));
+const dur=m=>m<24?m+' months':(m/12).toFixed(1).replace('.0','')+' years';
+
+function makeSection(root,cfg){
+  const H=cfg.funds.map(d=>Object.assign({},d,{gain:d.val-d.cost}));
+  const TOT=H.reduce((s,d)=>s+d.val,0);
+  let mode='xirr',n=3,removed=new Set();
+  const rank=()=>[...H].sort((a,b)=>mode==='xirr'?b.x-a.x:b.gain-a.gain);
+  const top=k=>rank().slice(0,k).map(d=>d.n);
+  removed=new Set(top(cfg.def));
+  root.innerHTML=`
+  <header><div class="eyebrow">${cfg.eyebrow}</div><h2 class="headline" data-r="hl"></h2><p class="lead" data-r="lede"></p></header>
+  <div class="hero" aria-live="polite">
+    <div class="big"><div class="eyebrow">As reported · all ${H.length} funds</div><div class="v" data-r="hA"></div><div class="s" data-r="sA"></div></div>
+    <div class="big now"><div class="eyebrow" data-r="nowLab"></div><div class="v" data-r="hB"></div><div class="s" data-r="sB"></div></div>
+  </div>
+  <div class="controls">
+    <div class="seg" role="group" aria-label="How many to leave out">${[0,1,2,3,4].map(k=>`<button type="button" data-k="${k}">${k?'Without top '+k:'All funds'}</button>`).join('')}</div>
+    <div class="rank"><span class="hint">Rank by</span><div class="seg" role="group" aria-label="Ranking"><button type="button" data-m="xirr">XIRR</button><button type="button" data-m="gain">Rupee gain</button></div></div>
+  </div>
+  <p class="hint">Or click any row below to take a fund out or put it back.</p>
+  <div class="panel"><div><h3>Portfolio XIRR</h3><p class="sub" data-r="rbSub"></p></div><div class="rb" data-r="rb"></div>
+    <div class="lg"><span><i style="background:var(--ghost)"></i>As reported</span><span><i style="background:var(--gain)"></i>Portfolio, current view</span><span><i style="background:var(--bench)"></i>Benchmark, current view</span></div></div>
+  <div class="panel"><div><h3>XIRR of each fund</h3><p class="sub">Bar is the fund's XIRR. The dark tick is its own benchmark. Right column is the fund's XIRR and current value. Hatched rows are left out.</p></div><div class="rows" data-r="rows"></div>
+    <div class="lg"><span><i style="background:var(--gain)"></i>Positive XIRR</span><span><i style="background:var(--loss)"></i>Negative XIRR</span><span><i class="tk"></i>Fund's benchmark</span></div></div>
+  <div class="panel"><div><h3>Where the money sits</h3><p class="sub" data-r="stSub"></p></div>
+    <div class="strip" data-r="strip" role="img" aria-label="Share of value by fund"></div><div class="stripl" data-r="stripl"></div></div>
+  <div class="facts" data-r="facts"></div>
+  <details><summary>Show the numbers</summary><div class="tw"><table data-r="tbl"></table></div></details>`;
+  const q=k=>root.querySelector(`[data-r="${k}"]`);
+  function agg(set){const x=H.filter(d=>!set.has(d.n));const fl=x.flatMap(d=>d.flows);
+    const val=x.reduce((s,d)=>s+d.val,0),bv=x.reduce((s,d)=>s+d.bv,0);
+    return {n:x.length,val,bv,x:xirr(fl,val),b:xirr(fl,bv),beat:x.filter(d=>d.x>d.bx).length,x_:x}}
+  const A=agg(new Set());
+  const tipHtml=d=>`<b>${d.full}</b><br>${d.cat} · held since ${d.since}<br>XIRR ${pc(d.x)} vs benchmark ${pc(d.bx)}<br>Value ${inr(d.val)}, cost still held ${inr(d.cost)}<br>Gain ${inr(d.gain)}`;
+  function render(){
+    const B=agg(removed),k=removed.size,gapx=(B.x!=null&&B.b!=null)?B.x-B.b:null;
+    const names=rank().filter(d=>removed.has(d.n)).map(d=>d.n);
+    const nm=names.length>2?names.slice(0,2).join(', ')+' and '+(names.length-2)+' more':names.join(' and ');
+    const remShare=1-B.val/TOT;
+    q('hl').innerHTML=k===0?`${pc(A.x)} XIRR on ${inr(A.val)}.`:`${pc(A.x)} becomes <span class="${cls(B.x)}">${pc(B.x)}</span> without ${W[k]||k} fund${k>1?'s':''}.`;
+    q('lede').textContent=k===0?`Benchmark XIRR on the same cash flows: ${pc(A.b)}. Choose how many of the top funds to leave out.`:
+      `${nm} ${k>1?'hold':'holds'} ${(remShare*100).toFixed(0)}% of today's value (${inr(TOT-B.val)} of ${inr(TOT)}). The other ${B.n} funds hold the remaining ${inr(B.val)} and have an XIRR of ${pc(B.x)}, against ${pc(B.b)} for the benchmark.`;
+    q('hA').innerHTML=`<span class="${cls(A.x)}">${pc(A.x,1)}</span>`;q('sA').textContent=`Benchmark ${pc(A.b,1)}. Current value ${inr(A.val)}.`;
+    q('nowLab').textContent=k===0?'Current view · nothing left out':`Without ${k} fund${k>1?'s':''}`;
+    q('hB').innerHTML=`<span class="${cls(B.x)}">${pc(B.x,1)}</span>`;q('sB').textContent=`Benchmark ${pc(B.b,1)}. Current value ${inr(B.val)}.`;
+    root.querySelectorAll('[data-k]').forEach(b=>{const t=top(+b.dataset.k);b.setAttribute('aria-pressed',(t.length===removed.size&&t.every(x=>removed.has(x)))?'true':'false')});
+    root.querySelectorAll('[data-m]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.m===mode?'true':'false'));
+    const vals=[A.x,A.b,B.x,B.b].filter(v=>v!=null),lo=Math.min(0,...vals)*1.15,hi=Math.max(0,...vals)*1.2,span=hi-lo,X=v=>((v-lo)/span*100),z=X(0);
+    const bar=(to,col)=>{const l=Math.min(X(0),X(to)),w=Math.abs(X(to)-X(0));return `style="left:${l}%;width:${Math.max(w,.4)}%;${col}"`};
+    const mk=(label,sub,rep,cur,col)=>`<div class="lab">${label}<small>${sub}</small></div><div class="axis"><div class="z" style="left:${z}%"></div>${rep!=null?`<div class="ghost" ${bar(rep,'')}></div>`:''}${cur!=null?`<div class="cur" ${bar(cur,'background:'+col)}></div>`:''}
+      <div class="val num" style="${cur<0?'right:'+(100-Math.min(X(cur),z)+1)+'%':'left:'+(Math.max(X(cur),z)+1)+'%'};color:var(--ink)">${pc(cur,1)}</div></div>`;
+    q('rb').innerHTML=mk('Portfolio XIRR',`${B.n} funds`,A.x,B.x,'var(--gain)')+mk('Benchmark XIRR','same cash flows',A.b,B.b,'var(--bench)');
+    q('rbSub').textContent=k===0?'The grey and coloured bars match until a fund is left out.':`Reported, the portfolio was ${((A.x-A.b)*100).toFixed(1)} points ${A.x<A.b?'behind':'ahead of'} the benchmark. With ${nm} left out it is ${gapx==null?'n/a':Math.abs(gapx*100).toFixed(1)+' points '+(gapx<0?'behind':'ahead')}.`;
+    const R=rank();const xs=H.flatMap(d=>[d.x,d.bx]),xmax=Math.max(0,...xs),xmin=Math.min(0,...xs),xs_=xmax-xmin,xz=-xmin/xs_*100;
+    q('rows').innerHTML=R.map((d,i)=>{const w=Math.abs(d.x)/xs_*100,l=d.x>=0?xz:xz-w,bl=xz+d.bx/xs_*100;
+      return `<button type="button" class="row${removed.has(d.n)?' off':''}" data-i="${i}" aria-pressed="${removed.has(d.n)}" aria-label="${d.full}, XIRR ${pc(d.x)}. Toggle">
+      <span class="nm" title="${d.full}">${d.n}</span><span class="tr"><span class="zl" style="left:${xz}%"></span><span class="bar" style="left:${l}%;width:${w}%;background:${d.x>=0?'var(--gain)':'var(--loss)'};border-radius:${d.x>=0?'0 3px 3px 0':'3px 0 0 3px'}"></span><span class="bm" style="left:${bl}%"></span></span>
+      <span class="gv num">${pc(d.x,1)}<small>${inr(d.val)}</small></span></button>`}).join('');
+    root.querySelectorAll('.row').forEach(r=>{const d=R[+r.dataset.i];r.onclick=()=>{removed.has(d.n)?removed.delete(d.n):removed.add(d.n);render()};r.onmousemove=e=>showTip(e,tipHtml(d));r.onmouseleave=hideTip});
+    const S=[...H].sort((a,b)=>b.val-a.val);
+    q('stSub').textContent=k===0?'Each block is one fund, sized by current value.':`Each block is one fund, sized by current value. Hatched blocks are the funds left out: ${(remShare*100).toFixed(0)}% of the money.`;
+    q('strip').innerHTML=S.map((d,i)=>`<div class="seg2 ${removed.has(d.n)?'off':''}" style="flex:${Math.max(d.val,TOT*0.002)} 0 0" data-i="${i}"></div>`).join('');
+    root.querySelectorAll('.seg2').forEach(s=>{const d=S[+s.dataset.i];s.onmousemove=e=>showTip(e,`<b>${d.full}</b><br>${(d.val/TOT*100).toFixed(1)}% of value · ${inr(d.val)}<br>XIRR ${pc(d.x)}`);s.onmouseleave=hideTip});
+    q('stripl').innerHTML=S.slice(0,3).map(d=>`<span><b class="num">${(d.val/TOT*100).toFixed(1)}%</b> ${d.n}</span>`).join('');
+    // facts
+    const left=B.x_,agesL=left.map(d=>monthsSince(d.since)).sort((a,b)=>a-b),med=agesL.length?agesL[Math.floor(agesL.length/2)]:0;
+    const rem=H.filter(d=>removed.has(d.n)),remAge=rem.length?rem.map(d=>monthsSince(d.since)):[];
+    q('facts').innerHTML=k===0?`<div class="fact"><b>${A.beat} of ${A.n}</b><span>funds are ahead of their own benchmark XIRR.</span></div>`:
+     `<div class="fact"><b>${(remShare*100).toFixed(0)}%</b><span>of the money is in the ${k} fund${k>1?'s':''} left out, but they carry the XIRR.</span></div>
+      <div class="fact"><b>${B.beat} of ${B.n}</b><span>of the funds left in are ahead of their own benchmark XIRR.</span></div>
+      <div class="fact"><b>${dur(Math.round(remAge.reduce((s,v)=>s+v,0)/remAge.length))}</b><span>is the average time the left-out funds have been held. For the funds left in the median is ${dur(med)}.</span></div>`;
+    q('tbl').innerHTML='<tr><th>Fund</th><th>Type</th><th>Since</th><th>Cost held</th><th>Value</th><th>Gain</th><th>XIRR</th><th>Benchmark XIRR</th></tr>'+R.map(d=>`<tr><td>${d.full}</td><td>${d.cat}</td><td class="num">${d.since}</td><td class="num">${Math.round(d.cost).toLocaleString('en-IN')}</td><td class="num">${Math.round(d.val).toLocaleString('en-IN')}</td><td class="num">${Math.round(d.gain).toLocaleString('en-IN')}</td><td class="num">${pc(d.x,1)}</td><td class="num">${pc(d.bx,1)}</td></tr>`).join('');
+  }
+  root.querySelectorAll('[data-k]').forEach(b=>b.onclick=()=>{removed=new Set(top(+b.dataset.k));render()});
+  root.querySelectorAll('[data-m]').forEach(b=>b.onclick=()=>{const kk=removed.size;mode=b.dataset.m;removed=new Set(top(kk));render()});
+  render();
+  return {A,get B(){return agg(removed)},get k(){return removed.size}};
+}
+const mkRoot=id=>{const s=document.createElement('section');s.className='sec';s.id=id;$$('#sections').appendChild(s);return s};
+const eq=FUNDS.filter(f=>f.type==='Equity');
+makeSection(mkRoot('equity'),{eyebrow:`Equity funds · ${eq.length} funds · ₹20.49 L`,funds:eq,def:3});
+</script>
+<script>
+(function(){
+const FEES={"funds": [{"id": "f0", "short": "Kotak Gold", "plan": "Direct", "cat": "Sector - Precious Metals", "value": 457528.55009399995, "x": 0.22112271971782513, "bx": 0.120321, "gap": null, "gob": null, "nc": "Gold, measured against an equity index", "ter": 0.71, "terSrc": "Account export (platform 0.66%, 5 Oct 2026, may exclude the gold ETF cost)", "dter": null, "kind": "gold"}, {"id": "f1", "short": "Parag Parikh Conservative Hybrid", "plan": "Direct", "cat": "Conservative Allocation", "value": 1040989.4560890001, "x": 0.0789077411340073, "bx": null, "gap": null, "gob": null, "nc": "benchmark not available for the units still held", "ter": 0.31, "terSrc": "platform fund page, 30 Sep 2026", "dter": null, "kind": "hybrid"}, {"id": "f2", "short": "HDFC Large Cap", "plan": "Regular", "cat": "Large-Cap", "value": 197057.572281, "x": -0.008441485654465897, "bx": 0.004908297184007315, "gap": -0.013349782838473212, "gob": -2630.6757966280884, "nc": null, "ter": 1.56, "terSrc": "platform fund page, 30 Sep 2026", "dter": 1.02, "kind": "equity"}, {"id": "f3", "short": "Axis Large Cap", "plan": "Direct", "cat": "Large-Cap", "value": 13870.47299, "x": 0.1410011967208098, "bx": null, "gap": null, "gob": null, "nc": "benchmark not available for the units still held", "ter": 0.94, "terSrc": "platform fund page, 9 Oct 2026", "dter": null, "kind": "equity"}, {"id": "f4", "short": "HDFC Multi-Asset Active FoF", "plan": "Direct", "cat": "Fund of Funds", "value": 680788.442859, "x": 0.0622747303329429, "bx": 0.001978, "gap": null, "gob": null, "nc": "Its 85% debt benchmark does not match a multi-asset fund", "ter": 0.14, "terSrc": "platform fund page, 30 Sep 2026 (fund of funds; underlying fund costs not included)", "dter": null, "kind": "hybrid"}, {"id": "f5", "short": "ICICI Prudential India Opportunities", "plan": "Regular", "cat": "Equity - Other", "value": 512597.20764, "x": 0.013977744145323179, "bx": 0.0022019441118537025, "gap": 0.011775800033469477, "gob": 6036.242214883472, "nc": null, "ter": 1.7, "terSrc": "platform fund page, 30 Sep 2026", "dter": 0.91, "kind": "equity"}, {"id": "f6", "short": "Nippon India Gold Savings", "plan": "Direct", "cat": "Sector - Precious Metals", "value": 1209413.9153250002, "x": 0.18950519266834906, "bx": 0.156401, "gap": null, "gob": null, "nc": "Gold, measured against an equity index", "ter": 0.93, "terSrc": "Account export (platform 0.06%, 30 Sep 2026, excludes the gold ETF cost)", "dter": null, "kind": "gold"}, {"id": "f7", "short": "Aditya Birla SL Digital India", "plan": "Direct", "cat": "Sector - Technology", "value": 136192.71168, "x": 0.2135049376795628, "bx": 0.512023, "gap": null, "gob": null, "nc": "The benchmark figure is not usable", "ter": 1.01, "terSrc": "platform fund page, 5 Oct 2026", "dter": null, "kind": "equity"}, {"id": "f8", "short": "Tata Digital India", "plan": "Direct", "cat": "Sector - Technology", "value": 58254.9995027, "x": 0.20774145531195676, "bx": 0.392282, "gap": null, "gob": null, "nc": "The benchmark figure is not usable", "ter": 0.67, "terSrc": "platform fund page, 30 Sep 2026", "dter": null, "kind": "equity"}, {"id": "f9", "short": "DSP ELSS Tax Saver (IDCW)", "plan": "Regular", "cat": "ELSS (Tax Savings)", "value": 8.262507, "x": 0.151534, "bx": 0.0, "gap": null, "gob": null, "nc": "The benchmark figure is not usable", "ter": 1.63, "terSrc": "Account export, not checked online", "dter": null, "kind": "equity"}, {"id": "f10", "short": "HDFC Technology", "plan": "Regular", "cat": "Sector - Technology", "value": 280441.459482, "x": -0.030322958845521185, "bx": 0.013630147432652635, "gap": -0.04395310627817382, "gob": -12326.273273418523, "nc": null, "ter": 2.15, "terSrc": "platform fund page, 30 Sep 2026", "dter": 1.1, "kind": "equity"}, {"id": "f11", "short": "HDFC Manufacturing", "plan": "Regular", "cat": "Equity - Other", "value": 551423.963156, "x": 0.05599531704289861, "bx": 0.0022019441118537025, "gap": 0.05379337293104491, "gob": 29662.954893165475, "nc": null, "ter": 1.83, "terSrc": "platform fund page, 30 Sep 2026", "dter": 0.92, "kind": "equity"}, {"id": "f12", "short": "Mirae Asset Smallcap 250 Momentum Quality 100 FoF", "plan": "Regular", "cat": "Equity - Other", "value": 298787.87228799996, "x": -0.011487939180621277, "bx": 0.042024266494688156, "gap": -0.053512205675309434, "gob": -15988.798075163542, "nc": null, "ter": 1.11, "terSrc": "Account export (platform 0.60%, 31 Aug 2026, fund of funds only)", "dter": null, "kind": "equity"}], "cmpGroup": {"x": 0.009785220140326175, "bx": 0.012406389207054011}, "goldValue": 1666942.465419, "hybridValue": 1721777.898948, "notes": ["Fee per year is the scheme's value on 14 Oct 2026 times its expense ratio. Rough yearly gain over benchmark is the gap between the fund's XIRR and its benchmark's XIRR, times the value; fund returns are after fees, so this gap is already net of the fee. XIRR is the annualised return on the units still held today (units already sold are not counted), recalculated from the transactions; it can differ from the portfolio app, which does not always use this basis.", "Expense ratios were checked on platform fund pages (dates in the table, 31 Aug to 9 Oct 2026), not against fund-house disclosures. For the three funds of funds that hold gold or index ETFs, the online figure leaves out the cost of the underlying ETF, so the higher figure from the account report is used. The HDFC Multi-Asset FoF figure of 0.14% also leaves out its underlying funds, so its true cost is higher. The Direct-plan cost of the Mirae fund of funds was not found, so its saving is not counted.", "Not compared: the two gold funds are measured against the Nifty 500 in the app; the HDFC Multi-Asset FoF is measured against an 85% debt index that shows 0.2% a year; for Aditya Birla SL Digital India, Tata Digital India and DSP ELSS the benchmark would have been worth less than zero after the same redemptions."]};
+const $=(s,r=document)=>r.querySelector(s);
+function inr(v){const s=v<0?"−":"";v=Math.abs(v);
+  if(v>=1e7)return s+"₹"+(v/1e7).toFixed(2)+" Cr";
+  if(v>=1e5)return s+"₹"+(v/1e5).toFixed(2)+" L";
+  return s+"₹"+Math.round(v).toLocaleString("en-IN");}
+function pct(x,d=1){if(x==null||isNaN(x))return "n/a";const v=(x*100).toFixed(d);return (v.startsWith("-")?"−"+v.slice(1):v)+"%";}
+function pp(x){return (x<0?"−":"+")+Math.abs(x*100).toFixed(1)+" pts";}
+function p0(x){return Math.round(x*100)+"%";}
+const cls=v=>v==null?"":v<0?"neg":"pos";
+const factsHTML=a=>a.map(([b,t])=>`<div class="fact"><b>${b}</b><span>${t}</span></div>`).join("");
+
+
+const MF=FEES.funds;
+const mfTotal=MF.reduce((s,r)=>s+r.value,0);
+const nCmp=MF.filter(f=>f.gap!=null).length;
+const root=$("#fees");
+const ter={};MF.forEach(f=>ter[f.id]=f.ter);
+root.innerHTML=`<header><div class="eyebrow">Fees · ${inr(mfTotal)} across all ${MF.length} schemes</div><h2 class="headline" data-r="hl"></h2><p class="lead" data-r="lede"></p></header>
+  <div class="hero hero3" data-r="cards"></div>
+  <div class="panel">
+    <div><h3>Fee against rupee gain, fund by fund</h3><p class="sub">Fee is today's value times the expense ratio. Gain over benchmark is the fund's XIRR minus its benchmark's, after fees, times today's value. Index fund cost is an assumption: <input class="ter" id="idx-ter" type="number" step="0.05" min="0" max="1.5" value="0.25" aria-label="Assumed cost of a direct index fund"> % a year for a direct index fund.</p></div>
+    <div class="fhead"><span>Fund</span><span>Fee per year</span><span>Rough yearly gain over benchmark</span></div>
+    <div data-r="rows"></div>
+    <div class="lg"><span><i style="background:var(--loss)"></i>Fee per year</span><span><i style="background:var(--gain)"></i>Rough yearly gain over benchmark</span><span><i style="background:var(--bench)"></i>Behind benchmark per year</span></div>
+  </div>
+  <div class="facts" data-r="facts"></div>
+  <details><summary>Show the numbers and edit expense ratios</summary><div class="tw" data-r="table"></div></details>
+  <div class="notes" data-r="notes"></div>`;
+const q=k=>root.querySelector(`[data-r="${k}"]`);
+const idx=$("#idx-ter");
+function calc(){
+  const it=(+idx.value||0)/100;
+  let fee=0,gob=0,save=0,regFee=0,regVal=0,dirSave=0,behind=0,behindFee=0;
+  const rows=MF.map(f=>{const t=(ter[f.id]||0)/100;const fe=f.value*t;const sv=Math.max(0,f.value*(t-it));
+    const ds=(f.plan==="Regular"&&f.dter!=null)?Math.max(0,f.value*(t-f.dter/100)):null;
+    fee+=fe;save+=sv;if(f.gob!=null)gob+=f.gob;
+    if(f.plan!=="Direct"){regFee+=fe;regVal+=f.value;if(ds!=null)dirSave+=ds;}
+    if(f.gap!=null&&f.gap<0){behind++;behindFee+=fe;}
+    return {...f,fe,sv,ds};});
+  return {rows,fee,gob,save,regFee,regVal,dirSave,behind,behindFee};
+}
+const nReg=MF.filter(f=>f.plan==="Regular").length;
+function draw(){
+  const c=calc();
+  q("hl").innerHTML=`Fund fees come to about <span class="num neg">${inr(c.fee)}</span> a year, for a gain over benchmark of <span class="num ${cls(c.gob)}">${inr(c.gob)}</span> a year.`;
+  q("lede").textContent=`Gain over benchmark is measured fund by fund on today's money, for the ${nCmp} funds with a usable benchmark. Measured instead on all their cash flows, including money already taken out, those ${nCmp} funds have an XIRR of ${pct(FEES.cmpGroup.x)} against ${pct(FEES.cmpGroup.bx)} for their benchmarks${FEES.cmpGroup.x<FEES.cmpGroup.bx?", so the lead depends on how it is measured":""}. ${nReg} of the ${MF.length} schemes are Regular plans, which carry a distributor commission inside the expense ratio. Past outperformance does not guarantee future outperformance.`;
+  q("cards").innerHTML=`
+    <div class="big"><div class="eyebrow">Fees per year</div><div class="v neg">${inr(c.fee)}</div><div class="s">${pct(c.fee/mfTotal,2)} of ${inr(mfTotal)}</div></div>
+    <div class="big now"><div class="eyebrow">Rough yearly gain over benchmark</div><div class="v ${cls(c.gob)}">${c.gob<0?"−":"+"}${inr(Math.abs(c.gob))}</div><div class="s">${c.gob<0?"The funds compared trail their benchmarks overall, after fees":"After fees, on the "+nCmp+" funds compared"}</div></div>
+    <div class="big"><div class="eyebrow">Saving from Regular to Direct</div><div class="v pos">${inr(c.dirSave)}</div><div class="s">a year, on the same funds. The ${nReg} Regular plans hold ${inr(c.regVal)}</div></div>`;
+  const R=c.rows.slice().sort((a,b)=>b.fe-a.fe);
+  const fmax=Math.max(...R.map(d=>d.fe)),gs=R.map(d=>d.gob).filter(v=>v!=null),gmin=Math.min(0,...gs),gmax=Math.max(0,...gs),gsp=(gmax-gmin)||1,gz=-gmin/gsp*100;
+  q("rows").innerHTML=R.map(f=>{
+    let g;
+    if(f.gob==null) g=`<div class="bw"></div><div class="cv" style="color:var(--muted)">Not compared</div><div class="cs">${f.nc}</div>`;
+    else{const gw=Math.abs(f.gob)/gsp*100,gl=f.gob>=0?gz:gz-gw;g=`<div class="bw"><span class="zl" style="left:${gz}%"></span><span class="b" style="left:${gl}%;width:${Math.max(gw,.8)}%;background:${f.gob>=0?"var(--gain)":"var(--bench)"};border-radius:${f.gob>=0?"0 3px 3px 0":"3px 0 0 3px"}"></span></div><div class="cv ${cls(f.gob)}">${f.gob<0?"−":"+"}${inr(Math.abs(f.gob))} <span class="cs">a year</span></div><div class="cs">${pp(f.gap)} vs benchmark</div>`;}
+    const save=f.ds!=null?`Direct plan at ${f.dter.toFixed(2)}% saves ${inr(f.ds)}`:f.plan==="Regular"?"Direct plan cost not found":(f.sv>0?`index fund saves ${inr(f.sv)}`:"costs no more than the assumed index fund");
+    return `<div class="fr"><div><div class="nm2"><span class="tagp ${f.plan==="Direct"?"":"reg"}">${f.plan}</span>${f.short}</div><div class="meta">${f.cat} · ${inr(f.value)}</div></div>
+      <div><div class="bw"><span class="b" style="left:0;width:${Math.max(f.fe/fmax*100,1)}%;background:var(--loss)"></span></div><div class="cv neg">${inr(f.fe)} <span class="cs">a year</span></div><div class="cs">${(ter[f.id]||0).toFixed(2)}% of ${inr(f.value)} · ${save}</div></div>
+      <div>${g}</div></div>`;}).join("");
+  q("facts").innerHTML=factsHTML([
+    [p0(c.regFee/c.fee),`of the fees are paid by the Regular plans, which hold ${p0(c.regVal/mfTotal)} of the money.`],
+    [`${c.behind} of ${nCmp}`,`funds compared are behind their benchmark. Together they pay ${inr(c.behindFee)} a year in fees.`],
+    [inr(c.save),`a year would be saved by holding index funds instead, but index funds only match the benchmark, less their own cost.`]]);
+}
+const tb=MF.slice().sort((a,b)=>b.value-a.value);
+q("table").innerHTML=`<table><thead><tr><th>Scheme</th><th>Plan</th><th>Value</th><th>Expense ratio %</th><th>Source</th><th>Direct plan %</th><th>XIRR</th><th>Benchmark</th><th>Gap</th></tr></thead><tbody>${tb.map(f=>`<tr><td>${f.short}</td><td>${f.plan}</td><td class="num">${inr(f.value)}</td><td><input class="ter" type="number" step="0.01" min="0" max="3" id="ter-${f.id}" value="${(f.ter||0).toFixed(2)}" aria-label="Expense ratio for ${f.short}"></td><td class="src">${f.terSrc}</td><td class="num">${f.plan==="Regular"?(f.dter==null?"n/a":f.dter.toFixed(2)):"–"}</td><td class="num">${pct(f.x)}</td><td class="num">${f.gap==null?"n/a":pct(f.bx)}</td><td class="num">${f.gap==null?"–":pp(f.gap)}</td></tr>`).join("")}</tbody></table>`;
+tb.forEach(f=>{$("#ter-"+f.id).oninput=e=>{ter[f.id]=+e.target.value||0;draw();};});
+idx.oninput=draw;
+draw();
+q("notes").innerHTML=FEES.notes.map(n=>`<p>${n}</p>`).join("");
+})();
+</script>
+
+</body></html>
