@@ -36,12 +36,7 @@
   details{border-bottom:1px solid #eee}
   summary{cursor:pointer;padding:12px 0;font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:#777;font-weight:600}
   details li:last-child{border-bottom:0}
-  .d{display:block;margin-top:2px;color:#555;font-size:14px}
-  details.x{border:0;margin-top:6px}
-  details.x summary{padding:2px 0;font-size:14px;text-transform:none;letter-spacing:0;color:#555;font-weight:400}
-  ol{margin:6px 0 0;padding-left:20px;color:#555;font-size:14px}
-  ol li{display:list-item;padding:2px 0;border:0}
-  @media (max-width:480px){li{flex-direction:column;gap:2px}ol li{display:list-item}}
+  @media (max-width:480px){li{flex-direction:column;gap:2px}}
 </style>
 </head>
 <body>
@@ -56,6 +51,7 @@
   <nav>
     <a href="#pm">Product Management</a>
     <a href="#finance">Finance</a>
+    <a href="#soon">Coming soon</a>
     <a href="#research">Research Reports</a>
     <a href="#projects">Personal Projects</a>
     <a href="#books">Books</a>
@@ -79,6 +75,13 @@
     </ul>
   </section>
 
+  <section id="soon">
+    <h2>Coming soon</h2>
+    <ul>
+      <li><span>Financial models</span><span class="m">Finance</span></li>
+    </ul>
+  </section>
+
   <section id="research">
     <h2>Research Reports</h2>
     <ul>
@@ -93,20 +96,7 @@
     <ul>
       <li><span><a href="https://pranjalparashar1.github.io/kiron/" target="_blank" rel="noopener">Kiron: quiz app for remembering what you read</a></span><span class="m">Web app</span></li>
       <li><span><a href="https://pranjalparashar1.github.io/maptro/" target="_blank" rel="noopener">Maptro: every Delhi Metro train on a map, by timetable</a></span><span class="m">Web app · <a href="https://github.com/pranjalparashar1/maptro" target="_blank" rel="noopener">Code</a></span></li>
-      <li><span><a href="https://pranjalparashar1.github.io/harveys/" target="_blank" rel="noopener">Harvey's: what to cook right now, from what you have</a><span class="d">Photograph your kitchen and an AI lists the food and cookware it sees. A deterministic, explainable ranking then picks the meal you'll actually make, weighing what's left of today's protein, calories and fiber against effort: tools, prep, steps and washing up. <a href="https://github.com/pranjalparashar1/harveys" target="_blank" rel="noopener" style="color:#555;text-decoration:underline">Code</a></span></span><span class="m">Web app</span></li>
-      <li style="display:block"><span>Job outreach auto-emailer<span class="tag">Claude + Gmail</span></span>
-        <span class="d">An AI agent that runs my job outreach end to end: it finds the right people at target firms, writes to them, and keeps track of every reply, so my time goes only into reviewing drafts and answering replies.</span>
-        <details class="x"><summary>Sample user flow</summary>
-          <ol>
-            <li>I name a sector: wealth managers, AMCs and PMS firms, VCs and micro VCs, or beauty and skincare brands.</li>
-            <li>It builds a target list and picks business or team leads who can hire and have time to reply, and skips firms that conflict with my current role.</li>
-            <li>It guesses each firm's email pattern and verifies the address.</li>
-            <li>It writes a tailored email for each person and saves it as a Gmail draft.</li>
-            <li>I review the drafts. Nothing is sent until I approve.</li>
-            <li>After sending, it checks for bounces and updates the tracker with real delivery status.</li>
-            <li>Three times a day (9:39 AM, 1:39 PM and 6:39 PM IST) it checks the inbox and tells me which replies need an answer.</li>
-          </ol>
-        </details></li>
+      <li><span><a href="https://pranjalparashar1.github.io/harveys/" target="_blank" rel="noopener">Harvey's: what to cook right now, from what you have</a></span><span class="m">Web app · <a href="https://github.com/pranjalparashar1/harveys" target="_blank" rel="noopener">Code</a></span></li>
       <li style="display:block"><span>Cals: AI calorie and protein tracker<span class="tag">Collaborative</span></span>
         <video controls playsinline muted preload="none" poster="media/cals_demo_poster.jpg"><source src="media/cals_demo.mp4" type="video/mp4"></video></li>
     </ul>
