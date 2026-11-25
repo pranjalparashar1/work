@@ -104,14 +104,14 @@
       <li><span><a href="files/Best_Funds_Analysis.pdf" target="_blank" rel="noopener">Best Funds Analysis</a><span class="tip" tabindex="0" role="button" aria-label="About this work">!<span class="b">This analysis and its presentation got me hired as a portfolio manager in my current role.</span></span></span><span class="m">PDF · 5 pp · Feb 2026</span></li>
       <li class="has-note"><span><a href="tools/Portfolio_tool.html" target="_blank" rel="noopener">Portfolio analysis tool</a></span><span class="m">Interactive · anonymised</span>
         <details class="note">
-          <summary>The client moment behind it</summary>
+          <summary>Reasoning for it (based on real client interactions)</summary>
           <div>
-            <p>We review a client's mutual fund portfolio on several fronts: returns against the benchmark, fees, sectors and market-cap mix.</p>
-            <p>One client had ₹76L, half in direct plans and half in regular plans. The usual way to show the fee is as a percentage: about 1.5% a year on regular plans against 0.5% on direct, so roughly 1% extra. Then you move on to the next drag.</p>
-            <p>I showed it in rupees instead, fund by fund: what the client had actually paid in regular-plan fees, next to what each fund had earned over its benchmark.</p>
-            <p>To get the numbers right, I went through the transaction files and worked out each fund's XIRR using the actual timing of every investment. Applying an average fee % to today's value would have misstated the cost, because money that went in later has paid fees for less time.</p>
-            <p>The client's reaction: "I didn't know I was paying this much for funds A, B and C. D is fine, but A, B and C are a surprise."</p>
-            <p>Same data, a simpler way to show it. It took knowing what to show, how to say it, and the finance to calculate it properly.</p>
+            <p>Client MF portfolios reviewed for drag factors: benchmark returns, fees, sectors, market-cap mix.</p>
+            <p>Example: ₹76L portfolio, half direct, half regular plans. Standard framing: about 1% a year extra in fees (1.5% regular vs 0.5% direct).</p>
+            <p>Reframed in rupees, per fund: fees paid on each regular plan against that fund's gain over its benchmark.</p>
+            <p>Each fund's XIRR calculated from transaction files with actual cash-flow timing. An average fee % would misstate the cost.</p>
+            <p>Client: "I didn't know I was paying this much for funds A, B and C. D is fine."</p>
+            <p>The point was to build a tool → implement → test → iterate with feedback → test → ship, through knowing how to be a bridge between finance and tech.</p>
           </div>
         </details>
       </li>
