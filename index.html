@@ -36,6 +36,12 @@
   details{border-bottom:1px solid #eee}
   summary{cursor:pointer;padding:12px 0;font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:#777;font-weight:600}
   details li:last-child{border-bottom:0}
+  li.has-note{flex-wrap:wrap}
+  .note{flex-basis:100%;border:0}
+  .note summary{padding:4px 0 0;font-size:13px;text-transform:none;letter-spacing:0;color:#555;font-weight:400}
+  .note div{margin-top:8px;padding:10px 12px;background:#f7f7f7;border-radius:6px;font-size:14px;color:#333}
+  .note p{margin:0 0 8px}
+  .note p:last-child{margin:0}
   @media (max-width:480px){li{flex-direction:column;gap:2px}}
 </style>
 </head>
@@ -68,7 +74,19 @@
     <h2>Finance</h2>
     <ul>
       <li><span><a href="files/Best_Funds_Analysis.pdf" target="_blank" rel="noopener">Best Funds Analysis</a><span class="tip" tabindex="0" role="button" aria-label="About this work">!<span class="b">This analysis and its presentation got me hired as a portfolio manager in my current role.</span></span></span><span class="m">PDF · 5 pp · Feb 2026</span></li>
-      <li><span><a href="tools/Portfolio_tool.html" target="_blank" rel="noopener">Portfolio analysis tool</a></span><span class="m">Interactive · anonymised</span></li>
+      <li class="has-note"><span><a href="tools/Portfolio_tool.html" target="_blank" rel="noopener">Portfolio analysis tool</a></span><span class="m">Interactive · anonymised</span>
+        <details class="note">
+          <summary>The client moment behind it</summary>
+          <div>
+            <p>We review a client's mutual fund portfolio on several fronts: returns against the benchmark, fees, sectors and market-cap mix.</p>
+            <p>One client had ₹76L, half in direct plans and half in regular plans. The usual way to show the fee is as a percentage: about 1.5% a year on regular plans against 0.5% on direct, so roughly 1% extra. Then you move on to the next drag.</p>
+            <p>I showed it in rupees instead, fund by fund: what the client had actually paid in regular-plan fees, next to what each fund had earned over its benchmark.</p>
+            <p>To get the numbers right, I went through the transaction files and worked out each fund's XIRR using the actual timing of every investment. Applying an average fee % to today's value would have misstated the cost, because money that went in later has paid fees for less time.</p>
+            <p>The client's reaction: "I didn't know I was paying this much for funds A, B and C. D is fine, but A, B and C are a surprise."</p>
+            <p>Same data, a simpler way to show it. It took knowing what to show, how to say it, and the finance to calculate it properly.</p>
+          </div>
+        </details>
+      </li>
       <li><span><a href="files/India_Wellness_Investor_Report_Nov2026.pdf" target="_blank" rel="noopener">India Non-Pharma Health &amp; Wellness: Investor Report</a></span><span class="m">PDF · 24 pp · Nov 2026</span></li>
       <li><span><a href="files/India_Wellness_Actionable_Insights.pdf" target="_blank" rel="noopener">India Wellness: Actionable Insights</a></span><span class="m">PDF · 14 pp · Nov 2026</span></li>
       <li><span><a href="files/Behavioral_Finance_Article.pdf" target="_blank" rel="noopener">The best strategy to (reliably) make money in the market</a><span class="tag">Behavioral finance</span></span><span class="m">PDF · 4 pp · Mar 2026</span></li>
