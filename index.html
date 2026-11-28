@@ -69,7 +69,7 @@
   .ideas details[open] summary::after{content:"\2212"}
   .ideas ul{list-style:disc;margin:0 0 12px;padding:0 0 0 46px;color:#333;font-size:14px}
   .ideas ul li{display:list-item;padding:2px 0;border:0}
-  .proof{margin:20px 0 0;text-align:center}
+  .proof{padding:4px 0 20px;text-align:center}
   .proof p{margin:0 0 10px;color:#888;font-size:13px}
   .logos{display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:10px 26px;color:#9a9a9a;user-select:none}
   .logos span{line-height:1;white-space:nowrap}
@@ -81,8 +81,11 @@
   .l6{font:700 18px/1 Helvetica,Arial,sans-serif;letter-spacing:.32em}
   .l7{font:400 20px/1 Georgia,"Times New Roman",serif;letter-spacing:.14em}
   .l8{font:italic 400 19px/1 Georgia,"Times New Roman",serif}
-  .bts{padding-top:48px}
-  .bts img{display:block;width:100%;height:auto;border-radius:12px}
+  .bts-open{display:block;width:100%;padding:12px 0;border:0;border-bottom:1px solid #eee;background:none;text-align:left;font:inherit;font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:#777;font-weight:600;cursor:pointer}
+  .bts-open:hover{color:#111}
+  #bts{width:min(720px,calc(100% - 32px));background:#000}
+  #bts .x{position:absolute;top:8px;right:8px;margin:0;color:#fff;background:rgba(0,0,0,.5);border-radius:6px}
+  #bts img{display:block;width:100%;height:auto}
   @media (max-width:480px){li{flex-direction:column;gap:2px}}
 </style>
 </head>
@@ -95,19 +98,6 @@
     <a href="files/Pranjal_Parashar_Resume.pdf" target="_blank" rel="noopener">Resume</a>
   </p>
 
-  <div class="proof" aria-label="Joke social proof">
-    <p>People at these companies have never even heard of me:</p>
-    <div class="logos">
-      <span class="l1">NVIDIA</span>
-      <span class="l2">NASA</span>
-      <span class="l3">ASML</span>
-      <span class="l4">SpaceX</span>
-      <span class="l5">CERN</span>
-      <span class="l6">TSMC</span>
-      <span class="l7">ROLEX</span>
-      <span class="l8">The Vatican</span>
-    </div>
-  </div>
 
   <nav>
     <a href="#pm">Product Management</a>
@@ -194,11 +184,30 @@
       </ul>
     </details>
   </section>
-  <section class="bts" id="bts">
-    <h2>Behind the scenes of any vibecode</h2>
-    <img src="media/lion.jpg" width="1170" height="675" loading="lazy" alt="Meme: a stern lion, captioned 'The lion is requesting another review on' a pull request showing +17,219 −2,966 lines changed.">
+  <section id="testimonials">
+    <details>
+      <summary>Testimonials</summary>
+      <div class="proof">
+        <p>People at these companies have never even heard of me:</p>
+        <div class="logos">
+          <span class="l1">NVIDIA</span>
+          <span class="l2">NASA</span>
+          <span class="l3">ASML</span>
+          <span class="l4">SpaceX</span>
+          <span class="l5">CERN</span>
+          <span class="l6">TSMC</span>
+          <span class="l7">ROLEX</span>
+          <span class="l8">The Vatican</span>
+        </div>
+      </div>
+    </details>
+    <button type="button" class="bts-open" id="bts-open">Behind the scenes of any vibecode</button>
   </section>
 </main>
+<dialog id="bts" aria-label="Behind the scenes of any vibecode">
+  <button class="x" type="button" aria-label="Close" data-close>&times;</button>
+  <img src="media/lion.jpg" width="1170" height="675" alt="Meme: a stern lion, captioned 'The lion is requesting another review on' a pull request showing +17,219 −2,966 lines changed.">
+</dialog>
 <dialog id="nm" aria-labelledby="nm-t">
   <div class="dh"><h2 id="nm-t">For N / M</h2><button class="x" type="button" aria-label="Close" data-close>&times;</button></div>
   <div class="db">
@@ -243,6 +252,13 @@
   dlg.addEventListener('click',function(e){if(e.target===dlg||e.target.hasAttribute('data-close'))close()});
   document.getElementById('nm-open').addEventListener('click',function(e){e.preventDefault();open()});
   if(location.hash==='#for-nm')open();
+})();
+</script>
+<script>
+(function(){
+  var d=document.getElementById('bts');
+  document.getElementById('bts-open').addEventListener('click',function(){d.showModal()});
+  d.addEventListener('click',function(e){if(e.target===d||e.target.hasAttribute('data-close'))d.close()});
 })();
 </script>
 </body>
